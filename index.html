@@ -1,0 +1,2331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CICS Document Management System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #2563eb;
+            --primary-light: #3b82f6;
+            --primary-soft: #dbeafe;
+            --secondary-color: #64748b;
+            --success-color: #10b981;
+            --success-light: #d1fae5;
+            --danger-color: #ef4444;
+            --danger-light: #fee2e2;
+            --warning-color: #f59e0b;
+            --warning-light: #fef3c7;
+            --background-color: #f1f5f9;
+            --card-bg: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --border-light: #f1f5f9;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-primary);
+            line-height: 1.5;
+            min-height: 100vh;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Loading Screen */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--background-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--border-color);
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Login Page */
+        #login-page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            background: linear-gradient(135deg, #f1f5f9 0%, #e4eaf1 100%);
+        }
+
+        .login-container {
+            background: var(--card-bg);
+            border-radius: 2rem;
+            box-shadow: var(--shadow-lg);
+            width: 100%;
+            max-width: 450px;
+            padding: 2.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo-wrapper {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 1.5rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            border-radius: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-md);
+        }
+
+        .logo-wrapper i {
+            font-size: 3.5rem;
+            color: white;
+        }
+
+        .login-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .login-header p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .login-content {
+            margin-top: 2rem;
+        }
+
+        .login-info {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: var(--primary-soft);
+            border-radius: 1rem;
+            color: var(--primary-color);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .google-btn {
+            width: 100%;
+            padding: 1rem;
+            background: white;
+            border: 2px solid var(--border-color);
+            border-radius: 1rem;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            transition: all 0.3s ease;
+        }
+
+        .google-btn:hover {
+            border-color: var(--primary-color);
+            background: var(--primary-soft);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .google-btn i {
+            color: #ea4335;
+            font-size: 1.2rem;
+        }
+
+        .login-note {
+            margin-top: 1.5rem;
+            padding: 0.75rem;
+            background: var(--border-light);
+            border-radius: 0.75rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        /* Program Selection Modal */
+        #program-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .program-modal-content {
+            background: var(--card-bg);
+            border-radius: 2rem;
+            padding: 2.5rem;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-color);
+        }
+
+        .program-modal-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .program-modal-header i {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .program-modal-header h2 {
+            font-size: 1.8rem;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .program-modal-header p {
+            color: var(--text-secondary);
+        }
+
+        .program-form {
+            margin-top: 2rem;
+        }
+
+        .program-form .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .program-form label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .program-form select {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 1rem;
+            font-size: 1rem;
+            color: var(--text-primary);
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .program-form select:hover,
+        .program-form select:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+
+        .program-form .btn-primary {
+            width: 100%;
+            padding: 1rem;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 1rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .program-form .btn-primary:hover {
+            background: var(--primary-light);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Navbar */
+        .navbar {
+            background: var(--card-bg);
+            border-bottom: 2px solid var(--border-light);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .nav-brand i {
+            font-size: 2rem;
+            color: var(--primary-color);
+        }
+
+        .nav-brand h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .badge {
+            padding: 0.35rem 1rem;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .admin-badge {
+            background: var(--primary-soft);
+            color: var(--primary-color);
+        }
+
+        .student-badge {
+            background: var(--success-light);
+            color: var(--success-color);
+        }
+
+        .nav-menu {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            background: transparent;
+            border: none;
+            padding: 0.75rem 1.25rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border-radius: 100px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: var(--border-light);
+            color: var(--primary-color);
+        }
+
+        .nav-link.active {
+            background: var(--primary-soft);
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding-left: 1rem;
+            margin-left: 1rem;
+            border-left: 2px solid var(--border-light);
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .user-role {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .user-program {
+            font-size: 0.75rem;
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        .logout-btn {
+            background: none;
+            border: 2px solid var(--border-light);
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logout-btn:hover {
+            background: var(--danger-light);
+            border-color: var(--danger-color);
+            color: var(--danger-color);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        /* Tab Content */
+        .tab-content {
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Tab Header */
+        .tab-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .tab-header h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .tab-header h2 i {
+            color: var(--primary-color);
+            margin-right: 0.5rem;
+        }
+
+        /* Search Bar */
+        .search-bar {
+            display: flex;
+            align-items: center;
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 100px;
+            padding: 0.5rem 1rem;
+            min-width: 350px;
+            transition: all 0.3s ease;
+        }
+
+        .search-bar:focus-within {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px var(--primary-soft);
+        }
+
+        .search-bar i {
+            color: var(--text-muted);
+            margin-right: 0.75rem;
+        }
+
+        .search-bar input {
+            border: none;
+            outline: none;
+            width: 100%;
+            font-size: 0.95rem;
+            color: var(--text-primary);
+            background: transparent;
+        }
+
+        .search-bar input::placeholder {
+            color: var(--text-muted);
+        }
+
+        /* Documents Grid */
+        .documents-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .document-card {
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .document-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--primary-color);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .document-card.admin-card::before {
+            content: 'Admin Upload';
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: var(--primary-soft);
+            color: var(--primary-color);
+            padding: 0.25rem 0.75rem;
+            border-radius: 100px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .document-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--primary-soft);
+            border-radius: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .document-info h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .document-info p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .document-meta {
+            display: flex;
+            gap: 1.5rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .document-meta span {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .document-actions {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .btn-download, .btn-delete, .btn-edit, .btn-view, .btn-stats {
+            padding: 0.6rem 1.2rem;
+            border: none;
+            border-radius: 100px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-download {
+            background: var(--primary-color);
+            color: white;
+            flex: 1;
+        }
+
+        .btn-download:hover {
+            background: var(--primary-light);
+            transform: scale(1.02);
+        }
+
+        .btn-delete {
+            background: var(--danger-light);
+            color: var(--danger-color);
+        }
+
+        .btn-delete:hover {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .btn-edit {
+            background: var(--warning-light);
+            color: var(--warning-color);
+        }
+
+        .btn-edit:hover {
+            background: var(--warning-color);
+            color: white;
+        }
+
+        .btn-view {
+            background: var(--border-light);
+            color: var(--text-secondary);
+        }
+
+        .btn-view:hover {
+            background: var(--primary-soft);
+            color: var(--primary-color);
+        }
+
+        .btn-stats {
+            background: var(--success-light);
+            color: var(--success-color);
+        }
+
+        .btn-stats:hover {
+            background: var(--success-color);
+            color: white;
+        }
+
+        /* Students Table */
+        .students-table {
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 1.5rem;
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .student-row {
+            display: grid;
+            grid-template-columns: 2fr 2fr 1.5fr 1fr 1.5fr 2fr;
+            padding: 1.25rem;
+            border-bottom: 2px solid var(--border-light);
+            align-items: center;
+        }
+
+        .student-row:last-child {
+            border-bottom: none;
+        }
+
+        .student-row.header {
+            background: var(--border-light);
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+
+        .program-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 100px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            background: var(--primary-soft);
+            color: var(--primary-color);
+            display: inline-block;
+        }
+
+        .student-status {
+            padding: 0.35rem 1rem;
+            border-radius: 100px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            text-align: center;
+            width: fit-content;
+        }
+
+        .status-active {
+            background: var(--success-light);
+            color: var(--success-color);
+        }
+
+        .status-blocked {
+            background: var(--danger-light);
+            color: var(--danger-color);
+        }
+
+        .login-time {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .student-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-block, .btn-unblock, .btn-view-stats, .btn-view-logs {
+            padding: 0.4rem 1rem;
+            border: none;
+            border-radius: 100px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .btn-block {
+            background: var(--danger-light);
+            color: var(--danger-color);
+        }
+
+        .btn-block:hover {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .btn-unblock {
+            background: var(--success-light);
+            color: var(--success-color);
+        }
+
+        .btn-unblock:hover {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .btn-view-stats {
+            background: var(--primary-soft);
+            color: var(--primary-color);
+        }
+
+        .btn-view-stats:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-view-logs {
+            background: var(--warning-light);
+            color: var(--warning-color);
+        }
+
+        .btn-view-logs:hover {
+            background: var(--warning-color);
+            color: white;
+        }
+
+        /* Statistics Dashboard */
+        .stats-dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stats-controls {
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .period-selector {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+
+        .period-btn {
+            padding: 0.75rem 1.5rem;
+            border: 2px solid var(--border-color);
+            background: var(--card-bg);
+            border-radius: 100px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+        }
+
+        .period-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .period-btn.active {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+        }
+
+        .date-range {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+            padding-top: 1rem;
+            border-top: 2px solid var(--border-light);
+        }
+
+        .date-range input {
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--border-color);
+            background: var(--card-bg);
+            border-radius: 100px;
+            font-size: 0.95rem;
+            color: var(--text-primary);
+        }
+
+        .date-range input:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .stat-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-header i {
+            font-size: 2rem;
+            color: var(--primary-color);
+            background: var(--primary-soft);
+            padding: 0.75rem;
+            border-radius: 1rem;
+        }
+
+        .stat-header h3 {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-main {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+        }
+
+        .stat-main p {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .stat-trend {
+            font-size: 0.9rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 100px;
+        }
+
+        .trend-up {
+            background: var(--success-light);
+            color: var(--success-color);
+        }
+
+        .trend-down {
+            background: var(--danger-light);
+            color: var(--danger-color);
+        }
+
+        /* Charts Container */
+        .charts-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-card {
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-header h3 {
+            font-size: 1.1rem;
+            color: var(--text-primary);
+        }
+
+        .chart-container {
+            height: 300px;
+            position: relative;
+        }
+
+        /* Upload Form */
+        .upload-form {
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 2rem;
+            padding: 2.5rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 1rem;
+            font-size: 1rem;
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px var(--primary-soft);
+        }
+
+        .file-upload-area {
+            border: 2px dashed var(--border-color);
+            border-radius: 1rem;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload-area:hover {
+            border-color: var(--primary-color);
+            background: var(--primary-soft);
+        }
+
+        .file-upload-area i {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .file-info {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: var(--border-light);
+            border-radius: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--border-light);
+            border-radius: 4px;
+            margin: 1.5rem 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--primary-color);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 1rem 2rem;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 1rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-light);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .page-btn {
+            padding: 0.75rem 1.25rem;
+            border: 2px solid var(--border-color);
+            background: var(--card-bg);
+            border-radius: 100px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .page-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .page-btn.active {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+        }
+
+        /* Welcome Section */
+        .welcome-section {
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .welcome-text h2 {
+            font-size: 1.8rem;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .welcome-text p {
+            color: var(--text-secondary);
+        }
+
+        .quick-stats {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .quick-stat {
+            text-align: center;
+        }
+
+        .quick-stat .value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .quick-stat .label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* Modals */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            border-radius: 2rem;
+            padding: 2.5rem;
+            max-width: 500px;
+            width: 90%;
+            border: 2px solid var(--border-color);
+            box-shadow: var(--shadow-lg);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .modal-icon.success {
+            color: var(--success-color);
+        }
+
+        .modal-icon.error {
+            color: var(--danger-color);
+        }
+
+        .modal-icon.warning {
+            color: var(--warning-color);
+        }
+
+        .modal-content h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+            text-align: center;
+        }
+
+        .modal-content p {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .btn-secondary {
+            padding: 0.75rem 1.5rem;
+            background: var(--border-light);
+            color: var(--text-secondary);
+            border: none;
+            border-radius: 100px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: var(--border-color);
+        }
+
+        .btn-danger {
+            padding: 0.75rem 1.5rem;
+            background: var(--danger-color);
+            color: white;
+            border: none;
+            border-radius: 100px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        /* Login History Modal */
+        .login-history {
+            margin-top: 1.5rem;
+        }
+
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem;
+            border-bottom: 2px solid var(--border-light);
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        .history-date {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .history-ip {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem;
+            color: var(--text-secondary);
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 2rem;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: var(--border-color);
+            margin-bottom: 1rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .student-row {
+                grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+                gap: 0.5rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1rem;
+            }
+
+            .nav-menu {
+                justify-content: center;
+            }
+
+            .user-menu {
+                border-left: none;
+                padding-left: 0;
+                margin-left: 0;
+            }
+
+            .student-row {
+                grid-template-columns: 1fr;
+                gap: 0.75rem;
+                padding: 1rem;
+            }
+
+            .student-row.header {
+                display: none;
+            }
+
+            .documents-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .search-bar {
+                min-width: 100%;
+            }
+
+            .welcome-section {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .quick-stats {
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .period-selector {
+                flex-direction: column;
+            }
+
+            .date-range {
+                flex-direction: column;
+            }
+
+            .document-actions {
+                flex-direction: column;
+            }
+
+            .student-actions {
+                flex-direction: column;
+            }
+
+            .quick-stats {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+
+        /* Tooltips */
+        [data-tooltip] {
+            position: relative;
+            cursor: help;
+        }
+
+        [data-tooltip]:before {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 0.5rem 1rem;
+            background: var(--text-primary);
+            color: white;
+            font-size: 0.8rem;
+            border-radius: 100px;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        [data-tooltip]:hover:before {
+            opacity: 1;
+            visibility: visible;
+            bottom: 120%;
+        }
+
+        /* Role-based visibility */
+        .admin-only {
+            display: none;
+        }
+
+        .student-only {
+            display: none;
+        }
+
+        body.admin-mode .admin-only {
+            display: flex;
+        }
+
+        body.admin-mode .student-only {
+            display: none;
+        }
+
+        body.student-mode .student-only {
+            display: flex;
+        }
+
+        body.student-mode .admin-only {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- Loading Screen -->
+        <div id="loading-screen" class="loading-screen">
+            <div class="spinner"></div>
+            <p>Loading CICS Document Management System...</p>
+        </div>
+
+        <!-- Login Page -->
+        <div id="login-page" class="page">
+            <div class="login-container">
+                <div class="login-header">
+                    <div class="logo-wrapper">
+                        <i class="fas fa-laptop-code"></i>
+                    </div>
+                    <h1>CICS Document MS</h1>
+                    <p>College of Computer and Information Sciences</p>
+                </div>
+                <div class="login-content">
+                    <div class="login-info">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Login with your neu.edu.ph email</span>
+                    </div>
+                    <button id="google-login-btn" class="google-btn">
+                        <i class="fab fa-google"></i>
+                        <span>Continue with Google</span>
+                    </button>
+                    <div class="login-note">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Use @neu.edu.ph email - Admin if email contains 'admin'</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Program Selection Modal (First time student login) -->
+        <div id="program-modal" class="modal hidden">
+            <div class="program-modal-content">
+                <div class="program-modal-header">
+                    <i class="fas fa-graduation-cap"></i>
+                    <h2>Welcome to CICS!</h2>
+                    <p>Please select your undergraduate program to continue</p>
+                </div>
+                <div class="program-form">
+                    <div class="form-group">
+                        <label for="student-program">Undergraduate Program</label>
+                        <select id="student-program" required>
+                            <option value="" disabled selected>Select your program</option>
+                            <option value="BS Computer Science">BS Computer Science</option>
+                            <option value="BS Information Technology">BS Information Technology</option>
+                            <option value="BS Information Systems">BS Information Systems</option>
+                            <option value="BS Computer Engineering">BS Computer Engineering</option>
+                            <option value="BS Data Science">BS Data Science</option>
+                            <option value="BS Cybersecurity">BS Cybersecurity</option>
+                            <option value="BS Software Engineering">BS Software Engineering</option>
+                            <option value="BS Multimedia Arts">BS Multimedia Arts</option>
+                        </select>
+                    </div>
+                    <button id="save-program-btn" class="btn-primary">
+                        <i class="fas fa-check"></i> Continue to Dashboard
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Dashboard (Combined for both Admin and Student) -->
+        <div id="main-dashboard" class="page hidden">
+            <nav class="navbar">
+                <div class="nav-brand">
+                    <i class="fas fa-laptop-code"></i>
+                    <h2>CICS Document MS</h2>
+                    <span id="role-badge" class="badge"></span>
+                </div>
+                <div class="nav-menu">
+                    <!-- Common tabs for both roles -->
+                    <button class="nav-link active" data-tab="documents">
+                        <i class="fas fa-file-alt"></i> Documents
+                    </button>
+                    
+                    <!-- Admin-only tabs -->
+                    <button class="nav-link admin-only" data-tab="students">
+                        <i class="fas fa-users"></i> Students
+                    </button>
+                    <button class="nav-link admin-only" data-tab="analytics">
+                        <i class="fas fa-chart-bar"></i> Analytics
+                    </button>
+                    <button class="nav-link admin-only" data-tab="upload">
+                        <i class="fas fa-upload"></i> Upload
+                    </button>
+                    
+                    <!-- Student-only tabs -->
+                    <button class="nav-link student-only" data-tab="my-downloads">
+                        <i class="fas fa-download"></i> My Downloads
+                    </button>
+                    
+                    <div class="user-menu">
+                        <div class="user-info">
+                            <span class="user-name" id="user-name">Loading...</span>
+                            <span class="user-role" id="user-role"></span>
+                            <span class="user-program" id="user-program"></span>
+                        </div>
+                        <button id="logout-btn" class="logout-btn" title="Logout">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </button>
+                    </div>
+                </div>
+            </nav>
+
+            <main class="container">
+                <!-- Welcome Section -->
+                <div class="welcome-section">
+                    <div class="welcome-text">
+                        <h2>Welcome back, <span id="welcome-name">User</span>! 👋</h2>
+                        <p id="welcome-message"></p>
+                    </div>
+                    <div class="quick-stats">
+                        <div class="quick-stat">
+                            <div class="value" id="total-docs-count">89</div>
+                            <div class="label">Total Documents</div>
+                        </div>
+                        <div class="quick-stat">
+                            <div class="value" id="my-downloads-count">24</div>
+                            <div class="label">My Downloads</div>
+                        </div>
+                        <div class="quick-stat admin-only">
+                            <div class="value" id="active-students-count">1,247</div>
+                            <div class="label">Active Students</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Documents Tab (Common for both roles) -->
+                <div id="documents-tab" class="tab-content active">
+                    <div class="tab-header">
+                        <h2><i class="fas fa-file-alt"></i> Document Library</h2>
+                        <div class="search-bar">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="search-docs" placeholder="Search documents by title or description...">
+                        </div>
+                    </div>
+
+                    <!-- Filter Section (Visible for both, but with different options) -->
+                    <div class="filter-section" style="background: var(--card-bg); border: 2px solid var(--border-color); border-radius: 1rem; padding: 1rem; margin-bottom: 1.5rem; display: flex; gap: 1rem; flex-wrap: wrap;">
+                        <div class="filter-group">
+                            <label>Filter by:</label>
+                            <select class="filter-select" id="doc-category-filter">
+                                <option value="all">All Categories</option>
+                                <option value="handbook">Handbooks</option>
+                                <option value="syllabus">Syllabi</option>
+                                <option value="research">Research</option>
+                                <option value="lecture">Lectures</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <select class="filter-select" id="doc-date-filter">
+                                <option value="all">All Time</option>
+                                <option value="recent">Recent</option>
+                                <option value="popular">Most Popular</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div id="documents-list" class="documents-grid">
+                        <!-- Student Handbook (Admin uploaded) -->
+                        <div class="document-card admin-card">
+                            <div class="document-icon">
+                                <i class="fas fa-file-pdf"></i>
+                            </div>
+                            <div class="document-info">
+                                <h3>CICS Student Handbook 2024</h3>
+                                <p>Official student handbook containing policies, guidelines, and academic procedures for CICS students.</p>
+                                <div class="document-meta">
+                                    <span><i class="fas fa-user"></i> Admin</span>
+                                    <span><i class="fas fa-calendar"></i> Jan 15, 2024</span>
+                                    <span><i class="fas fa-download"></i> 1.2k downloads</span>
+                                </div>
+                                <div class="document-actions">
+                                    <button class="btn-download"><i class="fas fa-download"></i> Download</button>
+                                    <button class="btn-view"><i class="fas fa-eye"></i> Preview</button>
+                                    <!-- Admin-only actions -->
+                                    <button class="btn-edit admin-only"><i class="fas fa-edit"></i></button>
+                                    <button class="btn-delete admin-only"><i class="fas fa-trash"></i></button>
+                                    <button class="btn-stats admin-only"><i class="fas fa-chart-line"></i></button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- CS 101 Syllabus (Admin uploaded) -->
+                        <div class="document-card admin-card">
+                            <div class="document-icon">
+                                <i class="fas fa-file-word"></i>
+                            </div>
+                            <div class="document-info">
+                                <h3>CS 101 Course Syllabus</h3>
+                                <p>Complete course syllabus for Introduction to Computer Science including grading system and requirements.</p>
+                                <div class="document-meta">
+                                    <span><i class="fas fa-user"></i> Dr. Santos</span>
+                                    <span><i class="fas fa-calendar"></i> Jan 10, 2024</span>
+                                    <span><i class="fas fa-download"></i> 892 downloads</span>
+                                </div>
+                                <div class="document-actions">
+                                    <button class="btn-download"><i class="fas fa-download"></i> Download</button>
+                                    <button class="btn-view"><i class="fas fa-eye"></i> Preview</button>
+                                    <button class="btn-edit admin-only"><i class="fas fa-edit"></i></button>
+                                    <button class="btn-delete admin-only"><i class="fas fa-trash"></i></button>
+                                    <button class="btn-stats admin-only"><i class="fas fa-chart-line"></i></button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Research Template (Admin uploaded) -->
+                        <div class="document-card admin-card">
+                            <div class="document-icon">
+                                <i class="fas fa-file-excel"></i>
+                            </div>
+                            <div class="document-info">
+                                <h3>Research Template & Guidelines</h3>
+                                <p>Standard research paper template for undergraduate thesis and capstone projects.</p>
+                                <div class="document-meta">
+                                    <span><i class="fas fa-user"></i> Admin</span>
+                                    <span><i class="fas fa-calendar"></i> Jan 5, 2024</span>
+                                    <span><i class="fas fa-download"></i> 567 downloads</span>
+                                </div>
+                                <div class="document-actions">
+                                    <button class="btn-download"><i class="fas fa-download"></i> Download</button>
+                                    <button class="btn-view"><i class="fas fa-eye"></i> Preview</button>
+                                    <button class="btn-edit admin-only"><i class="fas fa-edit"></i></button>
+                                    <button class="btn-delete admin-only"><i class="fas fa-trash"></i></button>
+                                    <button class="btn-stats admin-only"><i class="fas fa-chart-line"></i></button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Lecture Slides (Admin uploaded) -->
+                        <div class="document-card admin-card">
+                            <div class="document-icon">
+                                <i class="fas fa-file-powerpoint"></i>
+                            </div>
+                            <div class="document-info">
+                                <h3>CS 101 Lecture Slides</h3>
+                                <p>Complete lecture slides for Introduction to Computer Science - Weeks 1-5</p>
+                                <div class="document-meta">
+                                    <span><i class="fas fa-user"></i> Prof. Reyes</span>
+                                    <span><i class="fas fa-calendar"></i> Jan 3, 2024</span>
+                                    <span><i class="fas fa-download"></i> 423 downloads</span>
+                                </div>
+                                <div class="document-actions">
+                                    <button class="btn-download"><i class="fas fa-download"></i> Download</button>
+                                    <button class="btn-view"><i class="fas fa-eye"></i> Preview</button>
+                                    <button class="btn-edit admin-only"><i class="fas fa-edit"></i></button>
+                                    <button class="btn-delete admin-only"><i class="fas fa-trash"></i></button>
+                                    <button class="btn-stats admin-only"><i class="fas fa-chart-line"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pagination">
+                        <button class="page-btn active">1</button>
+                        <button class="page-btn">2</button>
+                        <button class="page-btn">3</button>
+                        <button class="page-btn">4</button>
+                        <button class="page-btn">5</button>
+                    </div>
+                </div>
+
+                <!-- Students Tab (Admin only) -->
+                <div id="students-tab" class="tab-content hidden">
+                    <div class="tab-header">
+                        <h2><i class="fas fa-users"></i> Student Management</h2>
+                        <div class="search-bar">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="student-search" placeholder="Search students by name, email, or program...">
+                        </div>
+                    </div>
+
+                    <div id="students-list" class="students-table">
+                        <div class="student-row header">
+                            <span>Name</span>
+                            <span>Email</span>
+                            <span>Program</span>
+                            <span>Status</span>
+                            <span>Last Login</span>
+                            <span>Actions</span>
+                        </div>
+                        
+                        <!-- Active Student -->
+                        <div class="student-row">
+                            <span><i class="fas fa-user-circle" style="color: var(--primary-color); margin-right: 0.5rem;"></i> John David Cruz</span>
+                            <span>john.cruz@neu.edu.ph</span>
+                            <span><span class="program-badge">BS Computer Science</span></span>
+                            <span><span class="student-status status-active">Active</span></span>
+                            <span class="login-time">Today 9:30 AM</span>
+                            <span class="student-actions">
+                                <button class="btn-block"><i class="fas fa-ban"></i> Block</button>
+                                <button class="btn-view-stats"><i class="fas fa-chart-bar"></i> Stats</button>
+                                <button class="btn-view-logs"><i class="fas fa-history"></i> Logs</button>
+                            </span>
+                        </div>
+
+                        <!-- Active Student -->
+                        <div class="student-row">
+                            <span><i class="fas fa-user-circle" style="color: var(--primary-color); margin-right: 0.5rem;"></i> Maria Sofia Santos</span>
+                            <span>maria.santos@neu.edu.ph</span>
+                            <span><span class="program-badge">BS Information Technology</span></span>
+                            <span><span class="student-status status-active">Active</span></span>
+                            <span class="login-time">Yesterday 2:15 PM</span>
+                            <span class="student-actions">
+                                <button class="btn-block"><i class="fas fa-ban"></i> Block</button>
+                                <button class="btn-view-stats"><i class="fas fa-chart-bar"></i> Stats</button>
+                                <button class="btn-view-logs"><i class="fas fa-history"></i> Logs</button>
+                            </span>
+                        </div>
+
+                        <!-- Blocked Student -->
+                        <div class="student-row">
+                            <span><i class="fas fa-user-circle" style="color: var(--text-muted); margin-right: 0.5rem;"></i> James Patrick Reyes</span>
+                            <span>james.reyes@neu.edu.ph</span>
+                            <span><span class="program-badge">BS Data Science</span></span>
+                            <span><span class="student-status status-blocked">Blocked</span></span>
+                            <span class="login-time">Jan 12, 2024</span>
+                            <span class="student-actions">
+                                <button class="btn-unblock"><i class="fas fa-check"></i> Unblock</button>
+                                <button class="btn-view-stats"><i class="fas fa-chart-bar"></i> Stats</button>
+                                <button class="btn-view-logs"><i class="fas fa-history"></i> Logs</button>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="pagination">
+                        <button class="page-btn active">1</button>
+                        <button class="page-btn">2</button>
+                        <button class="page-btn">3</button>
+                    </div>
+                </div>
+
+                <!-- Analytics Tab (Admin only) -->
+                <div id="analytics-tab" class="tab-content hidden">
+                    <h2><i class="fas fa-chart-bar"></i> Analytics Dashboard</h2>
+                    
+                    <div class="stats-controls">
+                        <div class="period-selector">
+                            <button class="period-btn active" data-period="daily">Daily</button>
+                            <button class="period-btn" data-period="weekly">Weekly</button>
+                            <button class="period-btn" data-period="monthly">Monthly</button>
+                            <button class="period-btn" data-period="custom">Custom Range</button>
+                        </div>
+                        <div id="custom-date-range" class="date-range hidden">
+                            <input type="date" id="start-date" value="2024-01-01">
+                            <span>to</span>
+                            <input type="date" id="end-date" value="2024-01-31">
+                            <button id="apply-date-range" class="btn-primary" style="width: auto;">Apply</button>
+                        </div>
+                    </div>
+
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <i class="fas fa-users"></i>
+                                <h3>Total Students</h3>
+                            </div>
+                            <div class="stat-main">
+                                <p>1,247</p>
+                                <span class="stat-trend trend-up">+12%</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <i class="fas fa-sign-in-alt"></i>
+                                <h3>Logins (Period)</h3>
+                            </div>
+                            <div class="stat-main">
+                                <p>3,842</p>
+                                <span class="stat-trend trend-up">+8%</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <i class="fas fa-download"></i>
+                                <h3>Downloads</h3>
+                            </div>
+                            <div class="stat-main">
+                                <p>12.5K</p>
+                                <span class="stat-trend trend-up">+15%</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <i class="fas fa-file-alt"></i>
+                                <h3>Documents</h3>
+                            </div>
+                            <div class="stat-main">
+                                <p>89</p>
+                                <span class="stat-trend trend-up">+5</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="charts-container">
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3>Student Login Activity</h3>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="login-chart"></canvas>
+                            </div>
+                        </div>
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3>Document Downloads</h3>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="download-chart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Upload Tab (Admin only) -->
+                <div id="upload-tab" class="tab-content hidden">
+                    <h2><i class="fas fa-upload"></i> Upload New Document</h2>
+                    
+                    <form id="upload-form" class="upload-form">
+                        <div class="form-group">
+                            <label for="document-title">Document Title</label>
+                            <input type="text" id="document-title" placeholder="e.g., CICS Student Handbook 2024" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="document-category">Category</label>
+                            <select id="document-category">
+                                <option value="handbook">Student Handbook</option>
+                                <option value="syllabus">Course Syllabus</option>
+                                <option value="research">Research & Thesis</option>
+                                <option value="lecture">Lecture Materials</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="document-description">Description</label>
+                            <textarea id="document-description" placeholder="Brief description of the document content..."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="document-file">File</label>
+                            <div class="file-upload-area" id="file-upload-area">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <p>Drag and drop or click to browse</p>
+                                <input type="file" id="document-file" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt" style="display: none;" required>
+                            </div>
+                        </div>
+
+                        <div id="upload-progress" class="progress-bar hidden">
+                            <div class="progress-fill"></div>
+                        </div>
+
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-cloud-upload-alt"></i> Upload Document
+                        </button>
+                    </form>
+                </div>
+
+                <!-- My Downloads Tab (Student only) -->
+                <div id="my-downloads-tab" class="tab-content hidden">
+                    <h2><i class="fas fa-download"></i> My Downloads</h2>
+                    
+                    <div class="documents-grid">
+                        <div class="document-card">
+                            <div class="document-icon">
+                                <i class="fas fa-file-pdf"></i>
+                            </div>
+                            <div class="document-info">
+                                <h3>CICS Student Handbook 2024</h3>
+                                <p>Downloaded on: Jan 15, 2024</p>
+                                <div class="document-meta">
+                                    <span><i class="fas fa-download"></i> Downloaded 2 times</span>
+                                </div>
+                                <div class="document-actions">
+                                    <button class="btn-download"><i class="fas fa-download"></i> Download Again</button>
+                                    <button class="btn-view"><i class="fas fa-eye"></i> View</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="document-card">
+                            <div class="document-icon">
+                                <i class="fas fa-file-word"></i>
+                            </div>
+                            <div class="document-info">
+                                <h3>CS 101 Course Syllabus</h3>
+                                <p>Downloaded on: Jan 10, 2024</p>
+                                <div class="document-actions">
+                                    <button class="btn-download"><i class="fas fa-download"></i> Download Again</button>
+                                    <button class="btn-view"><i class="fas fa-eye"></i> View</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <!-- Modals -->
+        <div id="confirm-modal" class="modal hidden">
+            <div class="modal-content">
+                <i class="fas fa-question-circle modal-icon warning"></i>
+                <h3 id="confirm-title">Confirm Action</h3>
+                <p id="confirm-message"></p>
+                <div class="modal-actions">
+                    <button id="confirm-cancel" class="btn-secondary">Cancel</button>
+                    <button id="confirm-ok" class="btn-danger">Confirm</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="success-modal" class="modal hidden">
+            <div class="modal-content">
+                <i class="fas fa-check-circle modal-icon success"></i>
+                <h3 id="success-title">Success</h3>
+                <p id="success-message"></p>
+                <button id="success-ok-btn" class="btn-primary">OK</button>
+            </div>
+        </div>
+
+        <div id="login-history-modal" class="modal hidden">
+            <div class="modal-content">
+                <h3><i class="fas fa-history"></i> Login History</h3>
+                <p id="history-student-name"></p>
+                <div class="login-history" id="login-history-list">
+                    <!-- History items will be populated here -->
+                </div>
+                <div class="modal-actions">
+                    <button class="btn-secondary" id="close-history-modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Application State
+        let currentUser = {
+            name: '',
+            email: '',
+            role: '', // 'admin' or 'student'
+            program: '',
+            isFirstTime: true
+        };
+
+        // Sample login history
+        const loginHistory = [
+            { date: 'Today, 9:30 AM', ip: '192.168.1.45' },
+            { date: 'Yesterday, 2:15 PM', ip: '192.168.1.45' },
+            { date: 'Jan 14, 2024', ip: '192.168.1.45' },
+            { date: 'Jan 13, 2024', ip: '192.168.1.78' },
+            { date: 'Jan 12, 2024', ip: '192.168.1.45' }
+        ];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Hide loading screen
+            setTimeout(() => {
+                document.getElementById('loading-screen').classList.add('hidden');
+            }, 1000);
+
+            // Initialize Charts
+            initCharts();
+
+            // Google Login Button
+            document.getElementById('google-login-btn').addEventListener('click', function() {
+                const email = prompt('Enter your neu.edu.ph email:', 'student@neu.edu.ph');
+                if (email && email.includes('@neu.edu.ph')) {
+                    const name = email.split('@')[0];
+                    const isAdmin = email.includes('admin');
+                    
+                    currentUser = {
+                        name: name,
+                        email: email,
+                        role: isAdmin ? 'admin' : 'student',
+                        program: '',
+                        isFirstTime: !isAdmin
+                    };
+
+                    if (!isAdmin && currentUser.isFirstTime) {
+                        // Show program selection for first-time students
+                        document.getElementById('program-modal').classList.remove('hidden');
+                    } else {
+                        // Direct login for admin or returning students
+                        completeLogin();
+                    }
+                } else {
+                    alert('Please use a valid @neu.edu.ph email address');
+                }
+            });
+
+            // Save Program Button
+            document.getElementById('save-program-btn').addEventListener('click', function() {
+                const program = document.getElementById('student-program').value;
+                if (program) {
+                    currentUser.program = program;
+                    currentUser.isFirstTime = false;
+                    document.getElementById('program-modal').classList.add('hidden');
+                    completeLogin();
+                } else {
+                    alert('Please select your program');
+                }
+            });
+
+            // Complete login and show dashboard
+            function completeLogin() {
+                document.getElementById('login-page').classList.add('hidden');
+                document.getElementById('main-dashboard').classList.remove('hidden');
+                
+                // Set body class for role-based styling
+                document.body.classList.remove('admin-mode', 'student-mode');
+                document.body.classList.add(currentUser.role + '-mode');
+                
+                // Update UI based on role
+                updateUIForRole();
+            }
+
+            // Update UI based on user role
+            function updateUIForRole() {
+                // Update user info
+                document.getElementById('user-name').textContent = currentUser.name;
+                document.getElementById('user-role').textContent = currentUser.role === 'admin' ? 'Administrator' : 'Student';
+                document.getElementById('welcome-name').textContent = currentUser.name;
+                
+                // Update role badge
+                const roleBadge = document.getElementById('role-badge');
+                roleBadge.textContent = currentUser.role === 'admin' ? 'Admin' : 'Student';
+                roleBadge.className = 'badge ' + (currentUser.role === 'admin' ? 'admin-badge' : 'student-badge');
+                
+                // Show/hide program for students
+                const userProgram = document.getElementById('user-program');
+                if (currentUser.role === 'student') {
+                    userProgram.textContent = currentUser.program;
+                    document.getElementById('welcome-message').textContent = `Access your study materials and documents for ${currentUser.program}`;
+                } else {
+                    userProgram.textContent = '';
+                    document.getElementById('welcome-message').textContent = 'Manage documents, students, and view analytics';
+                }
+                
+                // Update quick stats
+                if (currentUser.role === 'student') {
+                    document.getElementById('my-downloads-count').textContent = '24';
+                }
+            }
+
+            // Logout
+            document.getElementById('logout-btn').addEventListener('click', function() {
+                document.getElementById('main-dashboard').classList.add('hidden');
+                document.getElementById('login-page').classList.remove('hidden');
+                document.body.classList.remove('admin-mode', 'student-mode');
+            });
+
+            // Tab switching
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    const tabId = this.getAttribute('data-tab');
+                    
+                    // Update active state
+                    navLinks.forEach(l => l.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Hide all tabs
+                    document.querySelectorAll('.tab-content').forEach(tab => {
+                        tab.classList.add('hidden');
+                    });
+                    
+                    // Show selected tab
+                    document.getElementById(tabId + '-tab').classList.remove('hidden');
+                });
+            });
+
+            // Period selector
+            const periodBtns = document.querySelectorAll('.period-btn');
+            periodBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    periodBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    const isCustom = this.getAttribute('data-period') === 'custom';
+                    document.getElementById('custom-date-range').classList.toggle('hidden', !isCustom);
+                });
+            });
+
+            // Apply date range
+            document.getElementById('apply-date-range')?.addEventListener('click', function() {
+                const start = document.getElementById('start-date').value;
+                const end = document.getElementById('end-date').value;
+                showSuccess(`Showing statistics from ${start} to ${end}`);
+            });
+
+            // File upload area
+            const fileArea = document.getElementById('file-upload-area');
+            const fileInput = document.getElementById('document-file');
+            if (fileArea && fileInput) {
+                fileArea.addEventListener('click', () => fileInput.click());
+                fileArea.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    fileArea.style.borderColor = 'var(--primary-color)';
+                });
+                fileArea.addEventListener('dragleave', () => {
+                    fileArea.style.borderColor = 'var(--border-color)';
+                });
+                fileArea.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    fileArea.style.borderColor = 'var(--border-color)';
+                    if (e.dataTransfer.files.length) {
+                        fileInput.files = e.dataTransfer.files;
+                        showSuccess(`File selected: ${e.dataTransfer.files[0].name}`);
+                    }
+                });
+            }
+
+            // Upload form
+            document.getElementById('upload-form')?.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const progressBar = document.getElementById('upload-progress');
+                const progressFill = document.querySelector('.progress-fill');
+                
+                progressBar.classList.remove('hidden');
+                let width = 0;
+                const interval = setInterval(() => {
+                    if (width >= 100) {
+                        clearInterval(interval);
+                        setTimeout(() => {
+                            progressBar.classList.add('hidden');
+                            progressFill.style.width = '0%';
+                            showSuccess('Document uploaded successfully!');
+                            this.reset();
+                        }, 500);
+                    } else {
+                        width += 10;
+                        progressFill.style.width = width + '%';
+                    }
+                }, 300);
+            });
+
+            // Block/Unblock handlers
+            document.querySelectorAll('.btn-block, .btn-unblock').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const action = this.classList.contains('btn-block') ? 'block' : 'unblock';
+                    const row = this.closest('.student-row');
+                    const studentName = row.querySelector('span:first-child').textContent.trim();
+                    
+                    document.getElementById('confirm-title').textContent = `Confirm ${action}`;
+                    document.getElementById('confirm-message').textContent = `Are you sure you want to ${action} ${studentName}?`;
+                    document.getElementById('confirm-modal').classList.remove('hidden');
+
+                    document.getElementById('confirm-ok').onclick = function() {
+                        document.getElementById('confirm-modal').classList.add('hidden');
+                        
+                        // Update UI
+                        const statusSpan = row.querySelector('.student-status');
+                        const actionBtn = row.querySelector('.btn-block, .btn-unblock');
+                        
+                        if (action === 'block') {
+                            statusSpan.className = 'student-status status-blocked';
+                            statusSpan.textContent = 'Blocked';
+                            actionBtn.className = 'btn-unblock';
+                            actionBtn.innerHTML = '<i class="fas fa-check"></i> Unblock';
+                        } else {
+                            statusSpan.className = 'student-status status-active';
+                            statusSpan.textContent = 'Active';
+                            actionBtn.className = 'btn-block';
+                            actionBtn.innerHTML = '<i class="fas fa-ban"></i> Block';
+                        }
+
+                        showSuccess(`Student ${action}ed successfully`);
+                    };
+                });
+            });
+
+            // View logs
+            document.querySelectorAll('.btn-view-logs').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const row = this.closest('.student-row');
+                    const studentName = row.querySelector('span:first-child').textContent.trim();
+                    
+                    document.getElementById('history-student-name').textContent = studentName;
+                    
+                    // Populate login history
+                    const historyList = document.getElementById('login-history-list');
+                    historyList.innerHTML = '';
+                    loginHistory.forEach(item => {
+                        historyList.innerHTML += `
+                            <div class="history-item">
+                                <span class="history-date">${item.date}</span>
+                                <span class="history-ip">IP: ${item.ip}</span>
+                            </div>
+                        `;
+                    });
+                    
+                    document.getElementById('login-history-modal').classList.remove('hidden');
+                });
+            });
+
+            // Close history modal
+            document.getElementById('close-history-modal').addEventListener('click', function() {
+                document.getElementById('login-history-modal').classList.add('hidden');
+            });
+
+            // Delete document
+            document.querySelectorAll('.btn-delete').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const card = this.closest('.document-card');
+                    const docTitle = card.querySelector('h3').textContent;
+                    
+                    document.getElementById('confirm-title').textContent = 'Delete Document';
+                    document.getElementById('confirm-message').textContent = `Are you sure you want to delete "${docTitle}"?`;
+                    document.getElementById('confirm-modal').classList.remove('hidden');
+
+                    document.getElementById('confirm-ok').onclick = function() {
+                        document.getElementById('confirm-modal').classList.add('hidden');
+                        card.remove();
+                        showSuccess('Document deleted successfully');
+                    };
+                });
+            });
+
+            // Download button
+            document.querySelectorAll('.btn-download').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    showSuccess('Download started!');
+                });
+            });
+
+            // View button
+            document.querySelectorAll('.btn-view').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    showSuccess('Opening document preview...');
+                });
+            });
+
+            // Edit button
+            document.querySelectorAll('.btn-edit').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    showSuccess('Edit feature coming soon');
+                });
+            });
+
+            // Stats button
+            document.querySelectorAll('.btn-stats, .btn-view-stats').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    showSuccess('Loading document statistics...');
+                });
+            });
+
+            // Modal close buttons
+            document.getElementById('confirm-cancel').addEventListener('click', function() {
+                document.getElementById('confirm-modal').classList.add('hidden');
+            });
+
+            document.getElementById('success-ok-btn').addEventListener('click', function() {
+                document.getElementById('success-modal').classList.add('hidden');
+            });
+
+            // Search functionality
+            const searchInputs = document.querySelectorAll('input[type="text"]');
+            searchInputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    const searchTerm = this.value.toLowerCase();
+                    console.log('Searching:', searchTerm);
+                    // Implement search logic here
+                });
+            });
+
+            function showSuccess(message) {
+                document.getElementById('success-message').textContent = message;
+                document.getElementById('success-modal').classList.remove('hidden');
+            }
+
+            function initCharts() {
+                // Login Chart
+                const loginCtx = document.getElementById('login-chart')?.getContext('2d');
+                if (loginCtx) {
+                    new Chart(loginCtx, {
+                        type: 'line',
+                        data: {
+                            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                            datasets: [{
+                                label: 'Student Logins',
+                                data: [342, 378, 412, 398, 456, 289, 234],
+                                borderColor: '#2563eb',
+                                backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                                tension: 0.4,
+                                fill: true
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false
+                        }
+                    });
+                }
+
+                // Download Chart
+                const downloadCtx = document.getElementById('download-chart')?.getContext('2d');
+                if (downloadCtx) {
+                    new Chart(downloadCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+                            datasets: [{
+                                label: 'Downloads',
+                                data: [1250, 1450, 1680, 1890],
+                                backgroundColor: '#3b82f6',
+                                borderRadius: 6
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false
+                        }
+                    });
+                }
+            }
+        });
+    </script>
+</body>
+</html>
